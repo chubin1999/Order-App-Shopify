@@ -6,7 +6,7 @@ import { useAppQuery, useAuthenticatedFetch } from "../hooks";
 
 export function ProductsCard() {
   const emptyToastProps = { content: null };
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [toastProps, setToastProps] = useState(emptyToastProps);
   const fetch = useAuthenticatedFetch();
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ export function ProductsCard() {
     isLoading: isLoadingCount,
     isRefetching: isRefetchingCount,
   } = useAppQuery({
-    url: "/api/orders",
+    url: "/api/order-count",
     reactQueryOptions: {
       onSuccess: () => {
         setIsLoading(false);
@@ -46,26 +46,6 @@ export function ProductsCard() {
     <Toast {...toastProps} onDismiss={() => setToastProps(emptyToastProps)} />
   );
 
-  const handlePopulate = async () => {
-    setIsLoading(false);
-    const response = await fetch("/api/products/create");
-
-    if (response.ok) {
-      await refetchProductCount();
-      setToastProps({
-        content: t("ProductsCard.productsCreatedToast", {
-          count: productsCount,
-        }),
-      });
-    } else {
-      setIsLoading(false);
-      setToastProps({
-        content: t("ProductsCard.errorCreatingProductsToast"),
-        error: true,
-      });
-    }
-  };
-
   return (
     <>
       {toastMarkup}
@@ -77,7 +57,7 @@ export function ProductsCard() {
           <Text as="h4" variant="headingMd">
             {t("ProductsCard.totalProductsHeading")}
             <Text variant="bodyMd" as="p" fontWeight="semibold">
-              Orders: {data}
+              Orders: {isLoading ? '' : data.count}
             </Text>
           </Text>
         </TextContainer>

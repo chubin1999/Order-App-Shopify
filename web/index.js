@@ -39,12 +39,26 @@ app.use("/api/*", shopify.validateAuthenticatedSession());
 
 app.use(express.json());
 
-app.get("/api/orders", async (_req, res) => {
-  const countOder = await shopify.api.rest.Order.list({
-    session: es.locals.shopify.session,
+app.get("/api/orders/count", async (_req, res) => {
+  const countOrder = await shopify.api.rest.Order.count({
+    session: res.locals.shopify.session,
     status: "any",
   });
-  res.status(200).send(countOder);
+  res.status(200).send(countOrder);
+});
+
+// Route để lấy số lượng đơn hàng
+app.get('/api/order-count', async (req, res) => {
+  try {
+    // Gọi API để lấy số lượng đơn hàng
+    const countOrder = await shopify.api.rest.Order.count({
+      session: res.locals.shopify.session,
+      status: "any",
+    });
+  } catch (count) {
+    console.error('Error:', count);
+    res.status(500).json({ count: 'Error! An error occurred.' });
+  }
 });
 
 app.get("/api/products/count", async (_req, res) => {
