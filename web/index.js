@@ -51,10 +51,11 @@ app.get("/api/orders/count", async (_req, res) => {
 app.get('/api/order-count', async (req, res) => {
   try {
     // Gọi API để lấy số lượng đơn hàng
-    const countOrder = await shopify.api.rest.Order.count({
+    const countOrder = await shopify.api.rest.Order.all({
       session: res.locals.shopify.session,
       status: "any",
     });
+    res.status(200).send(countOrder);
   } catch (count) {
     console.error('Error:', count);
     res.status(500).json({ count: 'Error! An error occurred.' });
