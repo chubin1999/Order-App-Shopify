@@ -15,6 +15,7 @@ import {
   useSetIndexFiltersMode,
   ChoiceList,
   RangeSlider,
+  Link,
 } from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import { Toast } from "@shopify/app-bridge-react";
@@ -58,8 +59,6 @@ export function ProductsCard() {
     plural: 'orders',
   };
 
-  console.log(data)
-
   const {selectedResources, allResourcesSelected, handleSelectionChange} =
     useIndexResourceState(orders);
 
@@ -75,9 +74,15 @@ export function ProductsCard() {
         position={index}
       >
         <IndexTable.Cell>
-          <Text variant="bodyMd" fontWeight="bold" as="span">
-            {name}
-          </Text>
+          <Link
+            dataPrimaryLink
+            url={`/orders/new`}
+            onClick={() => console.log(`Clicked ${name}`)}
+          >
+            <Text variant="bodyMd" fontWeight="bold" as="span">
+              {name}
+            </Text>
+          </Link>
         </IndexTable.Cell>
         <IndexTable.Cell>{created_at}</IndexTable.Cell>
         <IndexTable.Cell>
