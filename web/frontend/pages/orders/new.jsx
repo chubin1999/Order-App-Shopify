@@ -2,7 +2,7 @@ import { Page, LegacyCard } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import React from 'react';
 export default function ManageCode() {
-  const breadcrumbs = [{ content: "Order details", url: "/" }];
+  const breadcrumbs = [{ content: "Order App", url: "/" }];
 
   return (
     <Page
@@ -12,7 +12,7 @@ export default function ManageCode() {
       }}
     >
       <TitleBar
-        title="Orders"
+        title="Order"
         breadcrumbs={breadcrumbs}
         primaryAction={null}
       />

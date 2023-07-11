@@ -1,5 +1,4 @@
 import { 
-  Card, 
   TextContainer, 
   Text,
   IndexTable,
@@ -16,6 +15,8 @@ import {
   ChoiceList,
   RangeSlider,
   Link,
+  Loading,
+  Frame,
 } from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import { Toast } from "@shopify/app-bridge-react";
@@ -30,7 +31,7 @@ export function ProductsCard() {
     data,
     isLoading: isLoadingCount,
   } = useAppQuery({
-    url: "/api/order-count",
+    url: "/api/order-all",
     reactQueryOptions: {
       onSuccess: () => {
         setIsLoading(false);
@@ -76,7 +77,7 @@ export function ProductsCard() {
         <IndexTable.Cell>
           <Link
             dataPrimaryLink
-            url={`/orders/new`}
+            url={`/orders/${id}`}
             onClick={() => console.log(`Clicked ${name}`)}
           >
             <Text variant="bodyMd" fontWeight="bold" as="span">
@@ -106,7 +107,13 @@ export function ProductsCard() {
   );
 
   if (isLoading || orders.length <= 0) {
-    return 'null';
+    return (
+      <div style={{height: '100px'}}>
+        <Frame>
+          <Loading />
+        </Frame>
+      </div>
+    );
   }
 
   return (

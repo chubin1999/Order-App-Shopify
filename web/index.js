@@ -49,7 +49,7 @@ app.get("/api/orders/count", async (_req, res) => {
 });
 
 // Route để lấy số lượng đơn hàng
-app.get('/api/order-count', async (req, res) => {
+app.get('/api/order-all', async (req, res) => {
   try {
     // Gọi API để lấy số lượng đơn hàng
     const countOrder = await shopify.api.rest.Order.all({
@@ -57,6 +57,21 @@ app.get('/api/order-count', async (req, res) => {
       status: "any",
     });
     res.status(200).send(countOrder);
+  } catch (count) {
+    console.error('Error:', count);
+    res.status(500).json({ count: 'Error! An error occurred.' });
+  }
+});
+
+// Route để lấy order details
+app.get("/api/order/:uid", async (_req, res) => {
+  try {
+    const orderInfo = await shopify.api.rest.Order.find({
+      session: res.locals.shopify.session,
+      id: _req.params.uid,
+      fields: "id,line_items,name,total_price",
+    });
+    res.status(200).send(orderInfo);
   } catch (count) {
     console.error('Error:', count);
     res.status(500).json({ count: 'Error! An error occurred.' });
