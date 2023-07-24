@@ -4,7 +4,7 @@ import { useAppQuery } from "../../hooks";
 import { useLocation } from 'react-router';
 import { useState } from 'react';
 
-export default function QRCodeEdit() {
+export default function OrderViewDetails() {
   const breadcrumbs = [{ content: "Order App", url: "/" }];
 
   const location = useLocation();
