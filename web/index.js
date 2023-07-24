@@ -78,6 +78,21 @@ app.get("/api/order/:uid", async (_req, res) => {
   }
 });
 
+// Route để lấy đơn hàng theo trạng thái đơn hàng
+app.get('/api/orders/:status', async (req, res) => {
+  const statusFilter = req.params.status;
+  try {
+    // Lấy đơn hàng từ Shopify qua API
+    const filterOrder = await shopify.api.rest.Order.all({
+      session: res.locals.shopify.session,
+      status: statusFilter,
+    });
+    res.status(200).send(filterOrder);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.get("/api/products/count", async (_req, res) => {
   const countData = await shopify.api.rest.Product.count({
     session: res.locals.shopify.session,

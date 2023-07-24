@@ -25,6 +25,7 @@ import { useAppQuery } from "../hooks";
 
 export function ProductsCard() {
   const [isLoading, setIsLoading] = useState(true);
+  const [dataOrders, setDataOrders] = useState(true);
   const { t } = useTranslation();
 
   const {
@@ -59,6 +60,18 @@ export function ProductsCard() {
     singular: 'order',
     plural: 'orders',
   };
+
+  
+  const {
+    dataFulFilled
+  } = useAppQuery({
+    url: `/api/orders/fulfilled`,
+    reactQueryOptions: {
+      onSuccess: () => {
+        setIsLoading(false);
+      },
+    },
+  });
 
   const {selectedResources, allResourcesSelected, handleSelectionChange} =
     useIndexResourceState(orders);
@@ -118,6 +131,8 @@ export function ProductsCard() {
 
   return (
     <LegacyCard>
+      <div onClick={() => console.log(`Clicked`)}>
+      Filter status</div>
       <IndexTable
         resourceName={resourceName}
         itemCount={orders.length}
