@@ -17,6 +17,9 @@ import {
   Link,
   Loading,
   Frame,
+  Button,
+  Popover,
+  ActionList,
 } from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import { Toast } from "@shopify/app-bridge-react";
@@ -25,7 +28,7 @@ import { useAppQuery } from "../hooks";
 
 export function ProductsCard() {
   const [isLoading, setIsLoading] = useState(true);
-  const [dataOrders, setDataOrders] = useState(true);
+  const [orders, setOrders] = useState([])
   const { t } = useTranslation();
 
   const {
@@ -35,32 +38,16 @@ export function ProductsCard() {
     url: "/api/order-all",
     reactQueryOptions: {
       onSuccess: () => {
+        setOrders(data != undefined ? data.data : []);
         setIsLoading(false);
       },
     },
   });
 
-   /*const {
-    data,
-    refetch: refetchProductCount,
-    isLoading: isLoadingCount,
-    isRefetching: isRefetchingCount,
-  } = useAppQuery({
-    url: "/api/products/count",
-    reactQueryOptions: {
-      onSuccess: () => {
-        setIsLoading(false);
-      },
-    },
-  });*/
-
-  const orders = data != undefined ? data.data : [];
-
   const resourceName = {
     singular: 'order',
     plural: 'orders',
   };
-
   
   const {
     dataFulFilled
@@ -72,6 +59,65 @@ export function ProductsCard() {
       },
     },
   });
+
+  const [active, setActive] = useState(true);
+
+  const toggleActive = useCallback(() => setActive((active) => !active), []);
+
+  const activator = (
+    <Button onClick={toggleActive} disclosure>
+      Filter
+    </Button>
+  );
+
+  const handleFulfilledAction = () => {
+    setIsLoading(true);
+    setOrders([])
+    setTimeout(function(){
+      setIsLoading(false);
+      const filteredObjects = orders.filter((object) => object.fulfillment_status === 'fulfilled');
+      setOrders(filteredObjects);
+    }, 2000);
+  };
+
+  const handleUnfulfilledAction = () => {
+    setIsLoading(true);
+    setOrders([])
+    setTimeout(function(){
+      setIsLoading(false);
+      const filteredObjects = orders.filter((object) => object.fulfillments.lenght === 0 || object.fulfillment_status === null);
+      setOrders(filteredObjects);
+    }, 2000);
+  };
+
+  const handlePaidAction = () => {
+    setIsLoading(true);
+    setOrders([])
+    setTimeout(function(){
+      setIsLoading(false);
+      const filteredObjects = orders.filter((object) => object.financial_status === 'paid');
+      setOrders(filteredObjects);
+    }, 2000);
+  };
+
+  const handleUnPaidAction = () => {
+    setIsLoading(true);
+    setOrders([])
+    setTimeout(function(){
+      setIsLoading(false);
+      const filteredObjects = orders.filter((object) => object.financial_status === 'unpaid' || object.financial_status === null);
+      setOrders(filteredObjects);
+    }, 2000);
+  };
+
+  const clearFilter = () => {
+    setIsLoading(true);
+    setOrders([])
+    setTimeout(function(){
+      setIsLoading(false);
+      setOrders(data != undefined ? data.data : []);
+    }, 2000);
+  };
 
   const {selectedResources, allResourcesSelected, handleSelectionChange} =
     useIndexResourceState(orders);
@@ -91,7 +137,7 @@ export function ProductsCard() {
           <Link
             dataPrimaryLink
             url={`/orders/${id}`}
-            onClick={() => console.log(`Clicked ${name}`)}
+            onClick={() => console.log('redirect')}
           >
             <Text variant="bodyMd" fontWeight="bold" as="span">
               {name}
@@ -119,7 +165,7 @@ export function ProductsCard() {
     ),
   );
 
-  if (isLoading || orders.length <= 0) {
+  if (isLoading) {
     return (
       <div style={{height: '100px'}}>
         <Frame>
@@ -131,27 +177,62 @@ export function ProductsCard() {
 
   return (
     <LegacyCard>
-      <div onClick={() => console.log(`Clicked`)}>
-      Filter status</div>
-      <IndexTable
-        resourceName={resourceName}
-        itemCount={orders.length}
-        selectedItemsCount={
-          allResourcesSelected ? 'All' : selectedResources.length
-        }
-        onSelectionChange={handleSelectionChange}
-        headings={[
-          {title: 'Order'},
-          {title: 'Date'},
-          {title: 'Customer'},
-          {title: 'Total', alignment: 'start'},
-          {title: 'Items'},
-          {title: 'Payment status'},
-          {title: 'Fulfillment status'},
-        ]}
-      >
-        {rowMarkup}
-      </IndexTable>
+      <div style={{height: 'auto', display: 'flex', 'align-items': 'center', gap: '20px'}}>
+        <Popover
+          active={active}
+          activator={activator}
+          autofocusTarget="first-node"
+          onClose={toggleActive}
+        >
+          <ActionList
+            actionRole="menuitem"
+            items={[
+              {
+                content: 'Fulfilled',
+                onAction: handleFulfilledAction,
+              },
+              {
+                content: 'Unfulfilled',
+                onAction: handleUnfulfilledAction,
+              },
+              {
+                content: 'Paid',
+                onAction: handlePaidAction,
+              },
+              {
+                content: 'Unpaid',
+                onAction: handleUnPaidAction,
+              },
+            ]}
+          />
+        </Popover>
+        <div onClick={clearFilter}>Clear status</div>
+      </div>
+      {orders.length <= 0 ? (
+        <LegacyCard title="Fails" sectioned>
+          <p>Do not see the results</p>
+        </LegacyCard>
+      ) : (
+        <IndexTable
+          resourceName={resourceName}
+          itemCount={orders.length}
+          selectedItemsCount={
+            allResourcesSelected ? 'All' : selectedResources.length
+          }
+          onSelectionChange={handleSelectionChange}
+          headings={[
+            {title: 'Order'},
+            {title: 'Date'},
+            {title: 'Customer'},
+            {title: 'Total', alignment: 'start'},
+            {title: 'Items'},
+            {title: 'Payment status'},
+            {title: 'Fulfillment status'},
+            ]}
+          >
+          {rowMarkup}
+        </IndexTable>
+      )}
     </LegacyCard>
   );
 }
