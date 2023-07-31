@@ -94,7 +94,7 @@ app.get('/api/orders/:status', async (req, res) => {
 });
 
 // Route để lấy đơn hàng theo số thứ tự
-app.get('/api/orders/:status', async (req, res) => {
+app.get('/api/orders/:order', async (req, res) => {
   const statusFilter = req.params.status;
   try {
     // Lấy đơn hàng từ Shopify qua API
