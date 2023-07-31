@@ -61,7 +61,7 @@ export function ProductsCard() {
     },
   });
 
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(false);
 
   const toggleActive = useCallback(() => setActive((active) => !active), []);
 
@@ -75,6 +75,7 @@ export function ProductsCard() {
 
   const handleSelectSort = (event) => {
     setSelected(event), []
+    setLoading()
     if (event === 'a-z') {
       setOrders(orders.sort(orderNumberAZ))
     } else if (event === 'z-a') {
@@ -114,12 +115,20 @@ export function ProductsCard() {
   function orderNumberHighToLow(a, b) {
     const numberA = a.current_subtotal_price;
     const numberB = b.current_subtotal_price;
-    return numberA - numberB;
+    return numberB - numberA;
+  }
+
+  function setLoading() {
+    setIsLoading(true);
+    setTimeout(function(){
+      setIsLoading(false);
+    }, 2000);
   }
 
   const handleFulfilledAction = () => {
     setIsLoading(true);
     setOrders([])
+    setActive(false)
     setTimeout(function(){
       setIsLoading(false);
       const filteredObjects = orders.filter((object) => object.fulfillment_status === 'fulfilled');
@@ -130,6 +139,7 @@ export function ProductsCard() {
   const handleUnfulfilledAction = () => {
     setIsLoading(true);
     setOrders([])
+    setActive(false)
     setTimeout(function(){
       setIsLoading(false);
       const filteredObjects = orders.filter((object) => object.fulfillments.lenght === 0 || object.fulfillment_status === null);
@@ -140,6 +150,7 @@ export function ProductsCard() {
   const handlePaidAction = () => {
     setIsLoading(true);
     setOrders([])
+    setActive(false)
     setTimeout(function(){
       setIsLoading(false);
       const filteredObjects = orders.filter((object) => object.financial_status === 'paid');
@@ -150,6 +161,7 @@ export function ProductsCard() {
   const handleUnPaidAction = () => {
     setIsLoading(true);
     setOrders([])
+    setActive(false)
     setTimeout(function(){
       setIsLoading(false);
       const filteredObjects = orders.filter((object) => object.financial_status === 'unpaid' || object.financial_status === null);

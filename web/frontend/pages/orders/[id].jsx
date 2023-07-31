@@ -80,7 +80,7 @@ export default function OrderViewDetails() {
         <LegacyCard.Section>
           <p>{id}</p>
         </LegacyCard.Section>
-        <LegacyCard.Section title="Addresses">
+        <LegacyCard.Section title="Information">
           {rowMarkup}
         </LegacyCard.Section>
         <LegacyCard.Section title="Total price">
