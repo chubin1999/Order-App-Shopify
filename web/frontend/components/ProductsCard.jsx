@@ -20,6 +20,7 @@ import {
   Button,
   Popover,
   ActionList,
+  Select,
 } from '@shopify/polaris';
 import {useState, useCallback} from 'react';
 import { Toast } from "@shopify/app-bridge-react";
@@ -69,6 +70,52 @@ export function ProductsCard() {
       Filter
     </Button>
   );
+
+  const [selected, setSelected] = useState('a-z');
+
+  const handleSelectSort = (event) => {
+    setSelected(event), []
+    if (event === 'a-z') {
+      setOrders(orders.sort(orderNumberAZ))
+    } else if (event === 'z-a') {
+      setOrders(orders.sort(orderNumberZA))
+    } else if (event === 'low-high') {
+      setOrders(orders.sort(orderNumberLowToHigh))
+    } else if (event === 'hight-low') {
+      setOrders(orders.sort(orderNumberHighToLow))
+    }
+  };
+
+  const options = [
+    {label: 'A-Z', value: 'a-z'},
+    {label: 'Z-A', value: 'z-a'},
+    {label: 'Low to high', value: 'low-high'},
+    {label: 'High to low', value: 'hight-low'}
+  ];
+
+  function orderNumberAZ(a, b) {
+    const numberA = a.order_number;
+    const numberB = b.order_number;
+    return numberA - numberB;
+  }
+
+  function orderNumberZA(a, b) {
+    const numberA = a.order_number;
+    const numberB = b.order_number;
+    return numberB - numberA;
+  }
+
+  function orderNumberLowToHigh(a, b) {
+    const numberA = a.current_subtotal_price;
+    const numberB = b.current_subtotal_price;
+    return numberA - numberB;
+  }
+
+  function orderNumberHighToLow(a, b) {
+    const numberA = a.current_subtotal_price;
+    const numberB = b.current_subtotal_price;
+    return numberA - numberB;
+  }
 
   const handleFulfilledAction = () => {
     setIsLoading(true);
@@ -177,36 +224,43 @@ export function ProductsCard() {
 
   return (
     <LegacyCard>
-      <div style={{height: 'auto', display: 'flex', 'align-items': 'center', gap: '20px'}}>
-        <Popover
-          active={active}
-          activator={activator}
-          autofocusTarget="first-node"
-          onClose={toggleActive}
-        >
-          <ActionList
-            actionRole="menuitem"
-            items={[
-              {
-                content: 'Fulfilled',
-                onAction: handleFulfilledAction,
-              },
-              {
-                content: 'Unfulfilled',
-                onAction: handleUnfulfilledAction,
-              },
-              {
-                content: 'Paid',
-                onAction: handlePaidAction,
-              },
-              {
-                content: 'Unpaid',
-                onAction: handleUnPaidAction,
-              },
-            ]}
-          />
-        </Popover>
-        <div onClick={clearFilter}>Clear status</div>
+      <div style={{height: 'auto', display: 'flex', 'align-items': 'center', 'justify-content': 'space-between', gap: '20px'}}>
+        <div style={{display: 'flex', 'align-items': 'center', gap: '20px'}}>
+          <Popover
+            active={active}
+            activator={activator}
+            autofocusTarget="first-node"
+            onClose={toggleActive}
+          >
+            <ActionList
+              actionRole="menuitem"
+              items={[
+                {
+                  content: 'Fulfilled',
+                  onAction: handleFulfilledAction,
+                },
+                {
+                  content: 'Unfulfilled',
+                  onAction: handleUnfulfilledAction,
+                },
+                {
+                  content: 'Paid',
+                  onAction: handlePaidAction,
+                },
+                {
+                  content: 'Unpaid',
+                  onAction: handleUnPaidAction,
+                },
+              ]}
+            />
+          </Popover>
+          <div onClick={clearFilter}>Clear status</div>
+        </div>
+        <Select
+          options={options}
+          onChange={handleSelectSort}
+          value={selected}
+        />
       </div>
       {orders.length <= 0 ? (
         <LegacyCard title="Fails" sectioned>
